@@ -1,0 +1,60 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.wangpengpro.jenkins"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        // 开发
+        debug {
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', 'API_URL', dev_api_url
+            buildConfigField 'String', 'H5_URL', dev_h5_url
+        }
+        // 测试
+        sit {
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', 'API_URL', sit_api_url
+            buildConfigField 'String', 'H5_URL', sit_h5_url
+        }
+        // 灰度
+        uat {
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', 'API_URL', uat_api_url
+            buildConfigField 'String', 'H5_URL', uat_h5_url
+        }
+        // 生产
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', 'API_URL', pro_api_url
+            buildConfigField 'String', 'H5_URL', pro_h5_url
+        }
+
+        applicationVariants.all {
+            def buildType = it.buildType.name
+            def fileName
+            def createTime = new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("GMT+08:00"))
+            it.outputs.each {
+                fileName = "V${defaultConfig.versionName}-${createTime}-${buildType}.apk"
+                println "文件名：-----------------${fileName}"
+                it.outputFileName = fileName
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}
